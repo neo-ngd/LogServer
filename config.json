@@ -1,0 +1,6 @@
+{
+    "port": 8080,
+    "friends":[
+        "http://localhost:8081"
+    ]
+}
