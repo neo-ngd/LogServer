@@ -12,13 +12,16 @@ type Transport struct {
 }
 
 func NewTransport(friends []string) *Transport {
-	t := Transport{}
+	t := Transport{
+		friends: friends,
+	}
 	return &t
 }
 func (t *Transport) Transfer(log string) {
 	for _, v := range t.friends {
-		go func(url string) {
+		go func(iport string) {
 			reader := strings.NewReader(log)
+			url := "http://" + iport
 			_, err := http.Post(url, "", reader)
 			if err != nil {
 				golog.Warn(err)
@@ -28,7 +31,6 @@ func (t *Transport) Transfer(log string) {
 }
 
 func (t *Transport) NeedToTransfer(ip string) bool {
-	golog.Info("[transport][needtotransfer] ", ip)
 	for _, v := range t.friends {
 		fip := strings.Split(v, ":")[0]
 		if fip == ip {

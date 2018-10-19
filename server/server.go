@@ -3,7 +3,6 @@ package server
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net"
 	"net/http"
 
@@ -26,10 +25,10 @@ func NewServer(host string, port int, friends []string) *Server {
 }
 
 func (s *Server) Start() {
-	log.Printf("server start listening: %d", s.port)
+	golog.Infof("server start listening: %d", s.port)
 	http.HandleFunc("/", s.handler)
 	if err := http.ListenAndServe(fmt.Sprintf("%s:%d", s.host, s.port), nil); err != nil {
-		log.Fatal("ListenAndServe: ", err)
+		golog.Fatal("ListenAndServe: ", err)
 	}
 
 }
@@ -40,11 +39,10 @@ func (s *Server) handler(w http.ResponseWriter, r *http.Request) {
 	}()
 	bytes, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Println(err)
+		golog.Error(string(bytes))
 		return
 	}
-	log.Println(string(bytes))
-	golog.Info(r.URL.String(), r.RequestURI, r.RemoteAddr)
+	golog.Info(string(bytes))
 	remoteIP := s.GetRemoteIp(r)
 	if s.tran.NeedToTransfer(remoteIP) {
 		go s.tran.Transfer(string(bytes))
