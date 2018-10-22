@@ -21,12 +21,12 @@ type PlainFormatter struct {
 func (p *PlainFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	return []byte(entry.Message), nil
 }
-func NewPersist(logPath, logname string, maxAge, rotateTime time.Duration) *Persist {
+func NewPersist(logPath, logname string, maxAge, rotationTime time.Duration) *Persist {
 	p := Persist{
 		log: logrus.New(),
 	}
 	p.log.SetLevel(logrus.InfoLevel)
-	p.configLocalFilesystemLogger(logPath, logname, maxAge, rotateTime)
+	p.configLocalFilesystemLogger(logPath, logname, maxAge, rotationTime)
 	return &p
 }
 func (p *Persist) configLocalFilesystemLogger(logPath string, logFileName string, maxAge time.Duration, rotationTime time.Duration) {
@@ -42,7 +42,7 @@ func (p *Persist) configLocalFilesystemLogger(logPath string, logFileName string
 		baseLogPaht+".%Y%m%d%H%M%S",
 		rotatelogs.WithLinkName(baseLogPaht),
 		rotatelogs.WithMaxAge(maxAge),
-		rotatelogs.WithRotationTime(10*time.Second),
+		rotatelogs.WithRotationTime(rotationTime),
 	)
 	if err != nil {
 		golog.Errorf("config local file system logger error. %+v", errors.WithStack(err))
