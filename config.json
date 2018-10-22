@@ -4,6 +4,7 @@
     "logname": "concensus.log",
     "logfileexpire": 30,
     "logfilesplit": 1,
-    "friends":[
+    "sendto":[
+        "127.0.0.1:8080"
     ]
 }

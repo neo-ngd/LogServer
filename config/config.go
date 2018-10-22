@@ -24,7 +24,7 @@ func init() {
 	}
 	var config struct {
 		Port          int      `json:"port"`
-		Friends       []string `json:"friends"`
+		Friends       []string `json:"sendto"`
 		LogPath       string   `json:"logpath"`
 		LogName       string   `json:"logname"`
 		LogFileExpire int      `json:"logfileexpire"`
