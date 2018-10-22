@@ -2,7 +2,7 @@
     "port": 8080,
     "logpath": "./persist",
     "logname": "concensus.log",
-    "logfileexpire": 1,
+    "logfileexpire": 30,
     "logfilesplit": 1,
     "friends":[
     ]

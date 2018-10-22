@@ -44,7 +44,6 @@ func (s *Backend) handler(w http.ResponseWriter, r *http.Request) {
 		golog.Error(string(bytes))
 		return
 	}
-	golog.Info(string(bytes))
 	s.pers.Add(string(bytes) + "\n")
 	remoteIP := s.GetRemoteIp(r)
 	if s.tran.NeedToTransfer(remoteIP) {

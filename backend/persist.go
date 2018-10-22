@@ -59,5 +59,5 @@ func (p *Persist) configLocalFilesystemLogger(logPath string, logFileName string
 }
 
 func (p *Persist) Add(arg ...interface{}) {
-	p.log.Infoln(arg...)
+	p.log.Println(arg...)
 }
