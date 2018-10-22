@@ -1,8 +1,8 @@
 package main
 
 import (
+	"log-backend/backend"
 	"log-backend/config"
-	"log-backend/server"
 )
 
 const (
@@ -10,6 +10,12 @@ const (
 )
 
 func main() {
-	s := server.NewServer(localhost, config.Port, config.Friends)
+	p := backend.NewPersist(
+		config.LogPath,
+		config.LogName,
+		config.LogFileExpire,
+		config.LogFileSplit,
+	)
+	s := backend.NewBackend(localhost, config.Port, config.Friends, p)
 	s.Start()
 }

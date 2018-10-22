@@ -3,15 +3,19 @@ package config
 import (
 	"encoding/json"
 	"io/ioutil"
+	"time"
 
 	"github.com/kataras/golog"
 )
 
-//Friends Friends are log-backends you want to send logs to
-var Friends []string
-
-//Port server port
-var Port int
+var (
+	Friends       []string
+	Port          int
+	LogPath       string
+	LogName       string
+	LogFileExpire time.Duration
+	LogFileSplit  time.Duration
+)
 
 func init() {
 	data, err := ioutil.ReadFile("./config.json")
@@ -19,8 +23,12 @@ func init() {
 		golog.Fatal(err)
 	}
 	var config struct {
-		Port    int      `json:"port"`
-		Friends []string `json:"friends"`
+		Port          int      `json:"port"`
+		Friends       []string `json:"friends"`
+		LogPath       string   `json:"logpath"`
+		LogName       string   `json:"logname"`
+		LogFileExpire int      `json:"logfileexpire"`
+		LogFileSplit  int      `json:"logfilesplit"`
 	}
 	err = json.Unmarshal(data, &config)
 	if err != nil {
@@ -28,4 +36,11 @@ func init() {
 	}
 	Port = config.Port
 	Friends = config.Friends
+	LogPath = config.LogPath
+	LogName = config.LogName
+	LogFileExpire = time.Duration(24*config.LogFileExpire) * time.Hour
+	LogFileSplit = time.Duration(config.LogFileSplit) * time.Hour
+	if LogName == "" || LogPath == "" {
+		golog.Fatal("invalid LogPath or LogName")
+	}
 }

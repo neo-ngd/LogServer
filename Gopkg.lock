@@ -14,14 +14,56 @@
   revision = "a9733b5b6b83d32b479aacd51d26ef6018261963"
 
 [[projects]]
+  name = "github.com/konsorten/go-windows-terminal-sequences"
+  packages = ["."]
+  revision = "5c8c8bd35d3832f5d134ae1e1e375b69a4d25242"
+  version = "v1.0.1"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/lestrrat/go-file-rotatelogs"
+  packages = ["."]
+  revision = "d3151e2a480fdcd05fb97102f5310a47d96274c4"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/lestrrat/go-strftime"
+  packages = ["."]
+  revision = "ba3bf9c1d0421aa146564a632931730344f1f9f1"
+
+[[projects]]
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
+
+[[projects]]
+  name = "github.com/rifflock/lfshook"
+  packages = ["."]
+  revision = "b9218ef580f59a2e72dad1aa33d660150445d05a"
+  version = "v2.4"
+
+[[projects]]
+  name = "github.com/sirupsen/logrus"
+  packages = ["."]
+  revision = "ad15b42461921f1fb3529b058c6786c6a45d5162"
+  version = "v1.1.1"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/crypto"
+  packages = ["ssh/terminal"]
+  revision = "0c41d7ab0a0ee717d4590a44bcb987dfd9e183eb"
+
+[[projects]]
   branch = "master"
   name = "golang.org/x/sys"
-  packages = ["unix"]
+  packages = ["unix","windows"]
   revision = "fa43e7bc11baaae89f3f902b2b4d832b68234844"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "8a0add3c201142fe3c658dcc9a579fab5264e2f46eb48a2e4cf4e1fa11f6e6ba"
+  inputs-digest = "b8298af795934f3915b4d04fe48364a09381d8b3342492b99b69310907d58d9e"
   solver-name = "gps-cdcl"
   solver-version = 1
