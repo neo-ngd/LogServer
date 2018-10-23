@@ -9,11 +9,13 @@ import (
 
 type Transport struct {
 	friends []string
+	name    string
 }
 
-func NewTransport(friends []string) *Transport {
+func NewTransport(name string, friends []string) *Transport {
 	t := Transport{
 		friends: friends,
+		name:    name,
 	}
 	return &t
 }
@@ -27,7 +29,7 @@ func (t *Transport) Transfer(log string) {
 				golog.Error(err)
 				return
 			}
-			req.Header.Set("role", "friend")
+			req.Header.Set("From", t.name)
 			client := http.Client{}
 			_, err = client.Do(req)
 			if err != nil {

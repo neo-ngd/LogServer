@@ -1,4 +1,5 @@
 {
+    "name": "ngd",
     "port": 8080,
     "logpath": "./persist",
     "logname": "concensus.log",

@@ -15,6 +15,7 @@ var (
 	LogName       string
 	LogFileExpire time.Duration
 	LogFileSplit  time.Duration
+	Name          string
 )
 
 func init() {
@@ -23,6 +24,7 @@ func init() {
 		golog.Fatal(err)
 	}
 	var config struct {
+		Name          string   `json:"name"`
 		Port          int      `json:"port"`
 		Friends       []string `json:"sendto"`
 		LogPath       string   `json:"logpath"`
@@ -40,7 +42,11 @@ func init() {
 	LogName = config.LogName
 	LogFileExpire = time.Duration(24*config.LogFileExpire) * time.Hour
 	LogFileSplit = time.Duration(config.LogFileSplit) * time.Hour
+	Name = config.Name
 	if LogName == "" || LogPath == "" {
 		golog.Fatal("invalid LogPath or LogName")
+	}
+	if Name == "" || Name == "local" {
+		golog.Fatal("please set a name. tip: dont use \"local\"")
 	}
 }

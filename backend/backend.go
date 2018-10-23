@@ -10,17 +10,19 @@ import (
 )
 
 type Backend struct {
+	name string
 	host string
 	port int
 	tran *Transport
 	pers *Persist
 }
 
-func NewBackend(host string, port int, friends []string, p *Persist) *Backend {
+func NewBackend(name, host string, port int, friends []string, p *Persist) *Backend {
 	s := Backend{
+		name: name,
 		host: host,
 		port: port,
-		tran: NewTransport(friends),
+		tran: NewTransport(name, friends),
 		pers: p,
 	}
 	return &s
@@ -44,11 +46,15 @@ func (s *Backend) handler(w http.ResponseWriter, r *http.Request) {
 		golog.Error(string(bytes))
 		return
 	}
+	name := r.Header.Get("From")
+	if name == "" {
+		name = "local"
+	}
 	log := string(bytes)
 	//persist
-	s.pers.Add(log + "\n")
+	s.pers.Add(fmt.Sprintf("[%s]", name), log+"\n")
 	//transfer
-	if !isFromFriend(r) {
+	if name == "local" {
 		s.tran.Transfer(log)
 	}
 }
@@ -61,12 +67,4 @@ func (s *Backend) GetRemoteIp(r *http.Request) string {
 		remoteIP = "127.0.0.1"
 	}
 	return remoteIP
-}
-
-func isFromFriend(r *http.Request) bool {
-	role := r.Header.Get("role")
-	if role == "friend" {
-		return true
-	}
-	return false
 }
