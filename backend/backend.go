@@ -44,10 +44,12 @@ func (s *Backend) handler(w http.ResponseWriter, r *http.Request) {
 		golog.Error(string(bytes))
 		return
 	}
-	s.pers.Add(string(bytes) + "\n")
-	remoteIP := s.GetRemoteIp(r)
-	if s.tran.NeedToTransfer(remoteIP) {
-		go s.tran.Transfer(string(bytes))
+	log := string(bytes)
+	//persist
+	s.pers.Add(log + "\n")
+	//transfer
+	if !isFromFriend(r) {
+		s.tran.Transfer(log)
 	}
 }
 
@@ -59,4 +61,12 @@ func (s *Backend) GetRemoteIp(r *http.Request) string {
 		remoteIP = "127.0.0.1"
 	}
 	return remoteIP
+}
+
+func isFromFriend(r *http.Request) bool {
+	role := r.Header.Get("role")
+	if role == "friend" {
+		return true
+	}
+	return false
 }

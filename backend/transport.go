@@ -22,7 +22,14 @@ func (t *Transport) Transfer(log string) {
 		go func(iport string) {
 			reader := strings.NewReader(log)
 			url := "http://" + iport
-			_, err := http.Post(url, "", reader)
+			req, err := http.NewRequest(http.MethodPost, url, reader)
+			if err != nil {
+				golog.Error(err)
+				return
+			}
+			req.Header.Set("role", "friend")
+			client := http.Client{}
+			_, err = client.Do(req)
 			if err != nil {
 				golog.Warn(err)
 			}
