@@ -24,4 +24,5 @@ after installation, configure your this application in **config.json**
 > if you want to send your cn-node logs to partners, set your partners log-backend url in "__*sendto*__"
 >set your node name to let partners recognize you, you can not use "" and "~~local~~", becase local is reserved for your cn-node, partners' logs using their names setting in Http Header "From"
 ## start
-```go run main.go```
+
+```cd log-backend && go run main.go```
