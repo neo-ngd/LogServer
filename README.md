@@ -21,8 +21,9 @@ after installation, configure your this application in **config.json**
 }
 ```
 
-> if you want to send your cn-node logs to partners, set your partners log-backend url in "__*sendto*__"
+> if you want to send your cn-node logs to partners, set your partners log-backend url in "__sendto__"
 >set your node name to let partners recognize you, you can not use "" and "~~local~~", becase local is reserved for your cn-node, partners' logs using their names setting in Http Header "From"
+> "__cnport__ " is for cn-node configuration and partners to send log, see [neo-plugins/LogBackend](https://github.com/KickSeason/neo-plugins)
 ## start
 
 ```cd log-backend && go run main.go```
