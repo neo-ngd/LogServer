@@ -3,6 +3,7 @@ package backend
 import (
 	"fmt"
 	"io/ioutil"
+	"log-backend/api"
 	"net"
 	"net/http"
 
@@ -15,23 +16,38 @@ type Backend struct {
 	port int
 	tran *Transport
 	pers *Persist
+	api  *api.SoServer
+	srv  *http.Server
 }
 
-func NewBackend(name, host string, port int, friends []string, p *Persist) *Backend {
+func NewBackend(name, host string, cnport int, webport int, friends []string, p *Persist) *Backend {
+	apisrv, err := api.NewServer(webport)
+	if err != nil {
+		golog.Fatal(err)
+	}
 	s := Backend{
 		name: name,
 		host: host,
-		port: port,
+		port: cnport,
 		tran: NewTransport(name, friends),
 		pers: p,
+		api:  apisrv,
 	}
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", s.handler)
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%d", cnport),
+		Handler: mux,
+	}
+	s.srv = srv
 	return &s
 }
 
 func (s *Backend) Start() {
+	s.api.Start()
 	golog.Infof("start listening: %d", s.port)
-	http.HandleFunc("/", s.handler)
-	if err := http.ListenAndServe(fmt.Sprintf("%s:%d", s.host, s.port), nil); err != nil {
+
+	if err := s.srv.ListenAndServe(); err != nil {
 		golog.Fatal("ListenAndServe: ", err)
 	}
 
@@ -57,6 +73,7 @@ func (s *Backend) handler(w http.ResponseWriter, r *http.Request) {
 	if name == "local" {
 		s.tran.Transfer(log)
 	}
+	s.api.SendLog(log)
 }
 
 func (s *Backend) GetRemoteIp(r *http.Request) string {

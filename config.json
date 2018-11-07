@@ -1,11 +1,11 @@
 {
     "name": "ngd",
-    "port": 8080,
+    "cnport": 8080,
+    "webport": 8081,
     "logpath": "./persist",
     "logname": "concensus.log",
     "logfileexpire": 30,
     "logfilesplit": 1,
     "sendto":[
-        "127.0.0.1:8081"
     ]
 }

@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"io/ioutil"
+	"strings"
 	"time"
 
 	"github.com/kataras/golog"
@@ -10,7 +11,8 @@ import (
 
 var (
 	Friends       []string
-	Port          int
+	Cnport        int
+	Webport       int
 	LogPath       string
 	LogName       string
 	LogFileExpire time.Duration
@@ -25,7 +27,8 @@ func init() {
 	}
 	var config struct {
 		Name          string   `json:"name"`
-		Port          int      `json:"port"`
+		Cnport        int      `json:"cnport"`
+		Webport       int      `json:"webport"`
 		Friends       []string `json:"sendto"`
 		LogPath       string   `json:"logpath"`
 		LogName       string   `json:"logname"`
@@ -36,7 +39,8 @@ func init() {
 	if err != nil {
 		golog.Error(err)
 	}
-	Port = config.Port
+	Cnport = config.Cnport
+	Webport = config.Webport
 	Friends = config.Friends
 	LogPath = config.LogPath
 	LogName = config.LogName
@@ -48,5 +52,13 @@ func init() {
 	}
 	if Name == "" || Name == "local" {
 		golog.Fatal("please set a name. tip: dont use \"local\"")
+	}
+	for _, v := range Friends {
+		arr := strings.Split(v, ":")
+		if (arr[0] == "127.0.0.1" || arr[0] == "" ||
+			arr[0] == "localhost" || arr[0] == "0.0.0.0") &&
+			(arr[1] == string(Cnport) || arr[1] == string(Webport)) {
+			golog.Fatal("you cannt send log to yourself.")
+		}
 	}
 }
