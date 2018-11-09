@@ -11,7 +11,7 @@ import (
 
 type logBody struct {
 	Text string
-	Tag  string
+	Name string
 	Key  int64
 }
 type SoServer struct {
@@ -71,9 +71,10 @@ func (s *SoServer) Start() {
 	}()
 }
 
-func (s *SoServer) SendLog(log string) {
+func (s *SoServer) SendLog(name, log string) {
 	golog.Info("sending log: ", log)
 	l := logBody{
+		Name: name,
 		Text: log,
 	}
 	s.sosrv.BroadcastTo("log", "log:log", l)

@@ -73,7 +73,7 @@ func (s *Backend) handler(w http.ResponseWriter, r *http.Request) {
 	if name == "local" {
 		s.tran.Transfer(log)
 	}
-	s.api.SendLog(fmt.Sprintf("[%s]%s", name, log))
+	s.api.SendLog(name, log)
 }
 
 func (s *Backend) GetRemoteIp(r *http.Request) string {
