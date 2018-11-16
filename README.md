@@ -1,11 +1,12 @@
 # log-server
-a log server for neo-cli with logbackend plugin
+a log server for neo-cli with LogBackendPlugin
 * save logs from your cn-node into files 
-* transfer your logs to partner, another log-server
+* transfer your logs to partner, another LogServer
 ## requisite
-install go at least v1.10
+install go at least v1.10  
+use with LogBackendPlugin v1.0.0
 ## installation
-* git clone https://github.com/KickSeason/log-server.git
+* git clone https://github.com/neo-ngd/LogServer.git
 ## configuration
 after installation, configure your this application in **config.json**
 ```
@@ -23,11 +24,11 @@ after installation, configure your this application in **config.json**
 }
 ```
 
-> if you want to send your cn-node logs to partners, set your partners log-server url in "__sendto__"
+> if you want to send your cn-node logs to partners, set your partners' LogServer url in "__sendto__"
 
-> set your node name to let partners recognize you, you can not use "" and "~~local~~", becase local is reserved for your cn-node, log-server use name to set in Http Header "From" when sending to partner.
+> set your node name to let partners recognize you, you can not use "" and "~~local~~", becase local is reserved for your cn-node, LogServer use name to set in Http Header "From" when sending to partner.
 
-> "__cnport__ " is for serving cn-node LogBackend, see [LogBackendPlugin](https://github.com/KickSeason/LogBackendPlugin)
+> "__cnport__ " is for serving cn-node LogBackendPlugin, see [LogBackendPlugin](https://github.com/KickSeason/LogBackendPlugin)
 ## start
 
 ```cd log-backend && go run main.go```
