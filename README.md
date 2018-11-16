@@ -1,16 +1,16 @@
-# log-backend
-a log backend for neo-cli with logbackendplugin
+# log-server
+a log server for neo-cli with logbackend plugin
 ## requisite
 install go at least v1.10
 ## installation
-* git clone https://github.com/KickSeason/log-backend.git 
+* git clone https://github.com/KickSeason/log-server.git
 ## configuration
 after installation, configure your this application in **config.json**
 ```
 {
     "name": "ngd",//the name of your node, let partners to recognize you
     "cnport": 8080, //the port to receive log from cn-node and partners
-    "webport": 8081,//the port to solve web api request
+    "webport": 8081,//the port to serve websocket
     "logpath": "./persist",//directory to store the log
     "logname": "concensus.log",//log file name
     "logfileexpire": 30,//day, how many days you want to store the log
@@ -21,9 +21,11 @@ after installation, configure your this application in **config.json**
 }
 ```
 
-> if you want to send your cn-node logs to partners, set your partners log-backend url in "__sendto__"
->set your node name to let partners recognize you, you can not use "" and "~~local~~", becase local is reserved for your cn-node, partners' logs using their names setting in Http Header "From"
-> "__cnport__ " is for cn-node configuration and partners to send log, see [neo-plugins/LogBackend](https://github.com/KickSeason/neo-plugins)
+> if you want to send your cn-node logs to partners, set your partners log-server url in "__sendto__"
+
+> set your node name to let partners recognize you, you can not use "" and "~~local~~", becase local is reserved for your cn-node, log-server use name to set in Http Header "From" when sending to partner.
+
+> "__cnport__ " is for serving cn-node LogBackend, see [LogBackend](https://github.com/KickSeason/LogBackend)
 ## start
 
 ```cd log-backend && go run main.go```
