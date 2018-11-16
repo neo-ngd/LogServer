@@ -1,8 +1,8 @@
 package main
 
 import (
-	"log-backend/backend"
-	"log-backend/config"
+	"github.com/neo-ngd/LogServer/backend"
+	"github.com/neo-ngd/LogServer/config"
 )
 
 const (

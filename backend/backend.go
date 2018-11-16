@@ -3,9 +3,10 @@ package backend
 import (
 	"fmt"
 	"io/ioutil"
-	"log-backend/api"
 	"net"
 	"net/http"
+
+	"github.com/neo-ngd/LogServer/api"
 
 	"github.com/kataras/golog"
 )
