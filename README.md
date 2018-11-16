@@ -1,5 +1,7 @@
 # log-server
 a log server for neo-cli with logbackend plugin
+* save logs from your cn-node into files 
+* transfer your logs to partner, another log-server
 ## requisite
 install go at least v1.10
 ## installation
