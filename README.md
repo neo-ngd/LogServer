@@ -1,4 +1,4 @@
-# log-server
+# LogServer
 a log server for neo-cli with LogBackendPlugin
 * save logs from your cn-node into files 
 * transfer your logs to partner, another LogServer
