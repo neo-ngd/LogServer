@@ -50,6 +50,12 @@
   revision = "ba3bf9c1d0421aa146564a632931730344f1f9f1"
 
 [[projects]]
+  name = "github.com/neo-ngd/LogServer"
+  packages = ["api","backend","config"]
+  revision = "6af7fab8598f4981942384f337058f5243a90c49"
+  version = "v1.0.0"
+
+[[projects]]
   name = "github.com/pkg/errors"
   packages = ["."]
   revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
@@ -64,24 +70,24 @@
 [[projects]]
   name = "github.com/sirupsen/logrus"
   packages = ["."]
-  revision = "ad15b42461921f1fb3529b058c6786c6a45d5162"
-  version = "v1.1.1"
+  revision = "bcd833dfe83d3cebad139e4a29ed79cb2318bf95"
+  version = "v1.2.0"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
-  revision = "0c41d7ab0a0ee717d4590a44bcb987dfd9e183eb"
+  revision = "3d3f9f413869b949e48070b5bc593aa22cc2b8f2"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix","windows"]
-  revision = "fa43e7bc11baaae89f3f902b2b4d832b68234844"
+  revision = "66b7b1311ac80bbafcd2daeef9a5e6e2cd1e2399"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "00bc9ce1e598507a512981cd7324e65b162be7d0fd6c01884db394517682a8ba"
+  inputs-digest = "5b4fd9570a3f160a9b2106054671dd7d163a50c78e3813e4c0b412c6af3dfad6"
   solver-name = "gps-cdcl"
   solver-version = 1
