@@ -27,7 +27,7 @@ after installation, configure your this application in **config.json**
 
 > set your node name to let partners recognize you, you can not use "" and "~~local~~", becase local is reserved for your cn-node, log-server use name to set in Http Header "From" when sending to partner.
 
-> "__cnport__ " is for serving cn-node LogBackend, see [LogBackend](https://github.com/KickSeason/LogBackend)
+> "__cnport__ " is for serving cn-node LogBackend, see [LogBackendPlugin](https://github.com/KickSeason/LogBackendPlugin)
 ## start
 
 ```cd log-backend && go run main.go```
