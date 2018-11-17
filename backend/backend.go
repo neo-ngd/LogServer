@@ -63,19 +63,14 @@ func (s *Backend) handler(w http.ResponseWriter, r *http.Request) {
 		golog.Error(string(bytes))
 		return
 	}
+	log := string(bytes)
 	name := r.Header.Get("From")
 	if name == "" {
 		name = s.name
-	}
-	log := string(bytes)
-
-	//persist
-	s.pers.Add(fmt.Sprintf("[%s]", name), log+"\n")
-
-	//transfer
-	if name == s.name {
 		s.tran.Transfer(log)
 	}
+	//persist
+	s.pers.Add(fmt.Sprintf("[%s]", name), log+"\n")
 
 	//send to web
 	s.api.SendLog(name, log)
