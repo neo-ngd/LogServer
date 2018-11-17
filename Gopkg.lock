@@ -52,8 +52,8 @@
 [[projects]]
   name = "github.com/neo-ngd/LogServer"
   packages = ["api","backend","config"]
-  revision = "6af7fab8598f4981942384f337058f5243a90c49"
-  version = "v1.0.0"
+  revision = "6f39df84d4d24c8357066f21377611b5aba79946"
+  version = "v1.1.0"
 
 [[projects]]
   name = "github.com/pkg/errors"
@@ -83,7 +83,7 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix","windows"]
-  revision = "66b7b1311ac80bbafcd2daeef9a5e6e2cd1e2399"
+  revision = "93218def8b18e66adbdab3eca8ec334700329f1f"
 
 [solve-meta]
   analyzer-name = "dep"

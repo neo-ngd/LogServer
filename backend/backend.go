@@ -65,15 +65,19 @@ func (s *Backend) handler(w http.ResponseWriter, r *http.Request) {
 	}
 	name := r.Header.Get("From")
 	if name == "" {
-		name = "local"
+		name = s.name
 	}
 	log := string(bytes)
+
 	//persist
 	s.pers.Add(fmt.Sprintf("[%s]", name), log+"\n")
+
 	//transfer
-	if name == "local" {
+	if name == s.name {
 		s.tran.Transfer(log)
 	}
+
+	//send to web
 	s.api.SendLog(name, log)
 }
 
