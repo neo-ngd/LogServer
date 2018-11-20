@@ -21,23 +21,25 @@ type Backend struct {
 	srv  *http.Server
 }
 
-func NewBackend(name, host string, cnport int, webport int, friends []string, p *Persist) *Backend {
-	apisrv, err := api.NewServer(webport)
+func NewBackend(name, host string, port int, friends []string, p *Persist) *Backend {
+	apisrv, err := api.NewServer()
 	if err != nil {
 		golog.Fatal(err)
 	}
 	s := Backend{
 		name: name,
 		host: host,
-		port: cnport,
+		port: port,
 		tran: NewTransport(name, friends),
 		pers: p,
 		api:  apisrv,
 	}
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", s.handler)
+	mux.Handle("/", http.FileServer(http.Dir("./public")))
+	mux.HandleFunc("/log", s.handler)
+	mux.HandleFunc("/socket.io/", apisrv.ServeHTTP)
 	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%d", cnport),
+		Addr:    fmt.Sprintf(":%d", port),
 		Handler: mux,
 	}
 	s.srv = srv
@@ -45,7 +47,6 @@ func NewBackend(name, host string, cnport int, webport int, friends []string, p 
 }
 
 func (s *Backend) Start() {
-	s.api.Start()
 	golog.Infof("start listening: %d", s.port)
 
 	if err := s.srv.ListenAndServe(); err != nil {

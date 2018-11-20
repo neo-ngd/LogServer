@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/kataras/golog"
@@ -16,8 +15,6 @@ type logBody struct {
 }
 type SoServer struct {
 	sosrv *socketio.Server
-	srv   *http.Server
-	port  int
 }
 
 func (s *SoServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -42,7 +39,7 @@ func errHandler(so socketio.Socket, err error) {
 	golog.Info(err)
 }
 
-func NewServer(port int) (*SoServer, error) {
+func NewServer() (*SoServer, error) {
 	s, e := socketio.NewServer(nil)
 	if e != nil {
 		golog.Error(e)
@@ -52,24 +49,16 @@ func NewServer(port int) (*SoServer, error) {
 	s.On("error", errHandler)
 	server := &SoServer{
 		sosrv: s,
-		port:  port,
 	}
-	mux := http.NewServeMux()
-	mux.HandleFunc("/socket.io/", server.ServeHTTP)
-	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%d", port),
-		Handler: mux,
-	}
-	server.srv = srv
 	return server, nil
 }
 
-func (s *SoServer) Start() {
-	golog.Infof("Serving webapi at localhost: %d...", s.port)
-	go func() {
-		golog.Fatal(s.srv.ListenAndServe())
-	}()
-}
+// func (s *SoServer) Start() {
+// 	golog.Infof("Serving webapi at localhost: %d...", s.port)
+// 	go func() {
+// 		golog.Fatal(s.srv.ListenAndServe())
+// 	}()
+// }
 
 func (s *SoServer) SendLog(name, log string) {
 	golog.Info("sending log: ", log)
