@@ -52,8 +52,8 @@
 [[projects]]
   name = "github.com/neo-ngd/LogServer"
   packages = ["api","backend","config"]
-  revision = "6f39df84d4d24c8357066f21377611b5aba79946"
-  version = "v1.1.0"
+  revision = "dc42142afc24060acae2995a8c0bf75f6bba8ef5"
+  version = "v1.1.2"
 
 [[projects]]
   name = "github.com/pkg/errors"

@@ -1,7 +1,6 @@
 {
     "name": "ngd",
-    "cnport": 8080,
-    "webport": 8081,
+    "port": 8080,
     "logpath": "./persist",
     "logname": "concensus.log",
     "logfileexpire": 30,
