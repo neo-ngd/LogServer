@@ -1,3 +1,3 @@
-var config = {
-    server: "http://localhost:8080/socket.io/"
+var Config = {
+    Server: "http://localhost:8080/socket.io/"
 };

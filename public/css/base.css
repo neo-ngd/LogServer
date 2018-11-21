@@ -57,3 +57,8 @@ p, ul {
 ul {
   padding-left: 30px;
 }
+
+.loglist {
+  background-color: black;
+  -webkit-text-fill-color: white;
+}

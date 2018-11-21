@@ -53,15 +53,7 @@ func NewServer() (*SoServer, error) {
 	return server, nil
 }
 
-// func (s *SoServer) Start() {
-// 	golog.Infof("Serving webapi at localhost: %d...", s.port)
-// 	go func() {
-// 		golog.Fatal(s.srv.ListenAndServe())
-// 	}()
-// }
-
 func (s *SoServer) SendLog(name, log string) {
-	golog.Info("sending log: ", log)
 	l := logBody{
 		Name: name,
 		Text: log,
