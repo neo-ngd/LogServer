@@ -9,8 +9,7 @@
  * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-import subscribeToLog from 'api'
-function numberStr(num, length) {
+var numberStr = function (num, length) {
   return (Array(length).join(' ') + num).slice(-length);  
 }
 var Log = React.createClass({
@@ -22,7 +21,7 @@ var Log = React.createClass({
   },
   render: function() {
     return (
-        <div className="Log">
+        <div className="log">
             <span dangerouslySetInnerHTML={this.rawMarkup()}/>
         </div>
   );
@@ -31,13 +30,9 @@ var Log = React.createClass({
 
 var LogBox = React.createClass({
   getInitialState: function() {
-    console.log('log box')
-    subscribeToLog((log, err) => {
+    SubscribeToLog((log, err) => {
         if (err) {
             console.log(err);
-            return;
-        }
-        if (!this.tagFilter(log)) {
             return;
         }
         let index = this.state.data.length + 1;
@@ -49,14 +44,15 @@ var LogBox = React.createClass({
         log.Key = index
         let newdata = this.state.data.concat(log);
         this.setState({data: newdata});
-    })
+    });
+    return {data: []};
   },
   componentWillMount: function() {
       this.setState({data: []});
   },
   render: function() {
     return (
-      <div className="logBox">
+      <div className="logbox">
         <h1>Logs</h1>
         <LogList data={this.state.data} />
       </div>
@@ -65,15 +61,6 @@ var LogBox = React.createClass({
 });
 
 var LogList = React.createClass({
-  scrollToBottom: () => {
-    this.el.scrollIntoView({ behavior: "smooth" });
-  },
-  componentDidMount: function() {
-      this.scrollToBottom();
-  },
-  componentDidUpdate: function() {
-      this.scrollToBottom();
-  },
   render: function() {
     var loglistFunc = this.props.data.map(function(log) {
       return (
@@ -81,11 +68,8 @@ var LogList = React.createClass({
       );
     });
     return (
-      <div>
-      <div className="logList" >
+      <div className="loglist" >
         {loglistFunc}
-      </div>
-      <div ref={el => {this.el = el;}}/>
       </div>
     );
   }
