@@ -71,7 +71,7 @@ func (s *Backend) handler(w http.ResponseWriter, r *http.Request) {
 		s.tran.Transfer(log)
 	}
 	//persist
-	s.pers.Add(fmt.Sprintf("[%s]", name), log+"\n")
+	s.pers.Add(fmt.Sprintf("[%s]", name), log)
 
 	//send to web
 	s.api.SendLog(name, log)

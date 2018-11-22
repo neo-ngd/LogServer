@@ -9,13 +9,16 @@
  * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-var numberStr = function (num, length) {
-  return (Array(length).join(' ') + num).slice(-length);  
+function padding(num, length) {
+  for(var len = (num + "").length; len < length; len = num.length) {
+      num = "0" + num;            
+  }
+  return num;
 }
 var Log = React.createClass({
   rawMarkup: function() {
     var md = new Remarkable();
-    var logstr = numberStr(this.props.log.Key, 4) + `:[${this.props.log.Name}] ${this.props.log.Text}`
+    var logstr = padding(this.props.log.Key, 4) + `:[${this.props.log.Name}] ${this.props.log.Text}`
     var rawMarkup = md.render(logstr);
     return { __html: rawMarkup };
   },

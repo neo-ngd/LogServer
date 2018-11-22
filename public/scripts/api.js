@@ -1,9 +1,8 @@
-var socketio = io.connect(Config.Server)
+var socketio = io.connect(document.location.href + 'socket.io/')
 var subscriber = null
-console.log('api init')
 socketio.on('connect', function() {
     socketio.on('log:log', log => subscriber(log, null));
-    socketio.send('log:subscribe', "log subscriber");
+    socketio.send('log:subscribe', "subscribe tag");
 });
 socketio.on('disconnect', function () {
 });
