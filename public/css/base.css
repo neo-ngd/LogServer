@@ -59,6 +59,6 @@ ul {
 }
 
 .loglist {
-  background-color: black;
-  -webkit-text-fill-color: white;
+  background-color: #222222;
+  -webkit-text-fill-color: #f1f1f1;
 }
