@@ -33,6 +33,12 @@ var Log = React.createClass({
 
 var LogBox = React.createClass({
   getInitialState: function() {
+    return {data: []};
+  },
+  componentWillMount: function() {
+      this.setState({data: []});
+  },
+  componentDidMount: function() {
     SubscribeToLog((log, err) => {
         if (err) {
             console.log(err);
@@ -48,10 +54,6 @@ var LogBox = React.createClass({
         let newdata = this.state.data.concat(log);
         this.setState({data: newdata});
     });
-    return {data: []};
-  },
-  componentWillMount: function() {
-      this.setState({data: []});
   },
   render: function() {
     return (
@@ -64,6 +66,16 @@ var LogBox = React.createClass({
 });
 
 var LogList = React.createClass({
+  scrollToBottom: function() {
+    let el = document.getElementById('scrolldiv')
+    el.scrollIntoView({ behavior: "smooth" });
+  },
+  componentDidMount: function() {
+    this.scrollToBottom();
+  },
+  componentDidUpdate: function() {
+      this.scrollToBottom();
+  },
   render: function() {
     var loglistFunc = this.props.data.map(function(log) {
       return (
@@ -71,8 +83,11 @@ var LogList = React.createClass({
       );
     });
     return (
-      <div className="loglist" >
-        {loglistFunc}
+      <div>
+        <div className="loglist" >
+          {loglistFunc}
+        </div>
+        <div id='scrolldiv'/>
       </div>
     );
   }
