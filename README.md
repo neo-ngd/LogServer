@@ -1,7 +1,8 @@
 # LogServer
 A log server for neo-cli with LogPlugin
 * save logs from your consensus node into files 
-* transfer your logs to partner, another LogServer
+* transfer your logs to partner, another LogServer  
+
 **warning**: LogServer2.0 integrated with LogMonigor you dont need to deploy logmonitor anymore.
 ## 1. requisite
 install go at least v1.10
