@@ -74,7 +74,7 @@ func (s *Backend) handler(w http.ResponseWriter, r *http.Request) {
 	s.pers.Add(fmt.Sprintf("[%s]", name), log)
 
 	//send to web
-	s.api.SendLog(name, log)
+	go s.api.SendLog(name, log)
 }
 
 func (s *Backend) GetRemoteIp(r *http.Request) string {
