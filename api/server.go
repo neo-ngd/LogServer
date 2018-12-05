@@ -1,13 +1,14 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/kataras/golog"
 
 	socketio "github.com/googollee/go-socket.io"
 )
+
+const cache_count = 50
 
 type logBody struct {
 	Text string
@@ -16,8 +17,7 @@ type logBody struct {
 }
 type SoServer struct {
 	sosrv *socketio.Server
-	srv   *http.Server
-	port  int
+	cache *logcache
 }
 
 func (s *SoServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -27,10 +27,14 @@ func (s *SoServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.sosrv.ServeHTTP(w, r)
 }
 
-func handler(so socketio.Socket) {
+func (s *SoServer) handler(so socketio.Socket) {
 	golog.Info("on connection.")
 	so.Join("log")
 	so.On("log:subscribe", func(msg string) {
+		cache := s.cache.GetCached()
+		for _, v := range cache {
+			so.Emit("log:log", v)
+		}
 		golog.Info("on subscribe", msg)
 	})
 	so.On("disconnection", func() {
@@ -38,44 +42,30 @@ func handler(so socketio.Socket) {
 	})
 }
 
-func errHandler(so socketio.Socket, err error) {
-	golog.Info(err)
+func (s *SoServer) errHandler(so socketio.Socket, err error) {
+	golog.Error(err)
 }
 
-func NewServer(port int) (*SoServer, error) {
+func NewServer() (*SoServer, error) {
 	s, e := socketio.NewServer(nil)
 	if e != nil {
 		golog.Error(e)
 		return nil, nil
 	}
-	s.On("connection", handler)
-	s.On("error", errHandler)
 	server := &SoServer{
 		sosrv: s,
-		port:  port,
+		cache: NewLogCache(cache_count),
 	}
-	mux := http.NewServeMux()
-	mux.HandleFunc("/socket.io/", server.ServeHTTP)
-	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%d", port),
-		Handler: mux,
-	}
-	server.srv = srv
+	server.sosrv.On("connection", server.handler)
+	server.sosrv.On("error", server.errHandler)
 	return server, nil
 }
 
-func (s *SoServer) Start() {
-	golog.Infof("Serving webapi at localhost: %d...", s.port)
-	go func() {
-		golog.Fatal(s.srv.ListenAndServe())
-	}()
-}
-
 func (s *SoServer) SendLog(name, log string) {
-	golog.Info("sending log: ", log)
 	l := logBody{
 		Name: name,
 		Text: log,
 	}
+	s.cache.Append(l)
 	s.sosrv.BroadcastTo("log", "log:log", l)
 }
