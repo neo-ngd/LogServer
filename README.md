@@ -10,8 +10,18 @@ use with LogPlugin v1.0.0
 ## 2. installation
 #### 2.1 source code
 * git clone https://github.com/neo-ngd/LogServer.git into your $GOPATH/github.com/neo-ngd
+* ```cd LogServer && go run main.go```
 #### 2.2 download application directly
 * https://github.com/neo-ngd/LogServer/releases
+* unzip LogServer-${version}-${platform}.zip
+* for linux
+```
+./main
+```
+* for windows
+```
+main.exe
+```
 ## 3. configuration
 after installation, configure your this application in **config.json**
 ```
@@ -23,7 +33,7 @@ after installation, configure your this application in **config.json**
     "logfileexpire": 30,//day, how many days you want to store the log 
     "logfilesplit": 1,//hour, how many hours to split the file into
     "sendto":[//partners you want to send your log
-           "http://ngd1.logbackend:8080"
+           "http://ngd1.logbackend:8080/log"
     ]
 }
 ```
@@ -33,10 +43,6 @@ after installation, configure your this application in **config.json**
 > set your node name to let partners recognize you, LogServer use name to set in Http Header "From" when sending to partner.
 
 > "__port__ " is for serving cn-node LogPlugin using "__http://logserverip:port/log__" and LogMonitor using "__http://logserverip:port__".
-
-## 4. start
-
-```cd log-backend && go run main.go```
 
 ## 5. usage
 LogServer can both receive logs from cn and provide LogMonitor 
