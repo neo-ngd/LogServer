@@ -58,7 +58,7 @@ var LogBox = React.createClass({
   render: function() {
     return (
       <div className="logbox">
-        <h1>Logs</h1>
+        <h1>Log Monitor</h1>
         <LogList data={this.state.data} />
       </div>
     );
