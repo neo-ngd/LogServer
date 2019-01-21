@@ -9,6 +9,7 @@
  * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+var Combobox = ReactWidgets.Combobox;
 function padding(num, length) {
   for(var len = (num + "").length; len < length; len = num.length) {
       num = "0" + num;            
@@ -35,31 +36,49 @@ var LogBox = React.createClass({
   getInitialState: function() {
     return {data: []};
   },
+  logHandler: (log, err) => {
+    if (err) {
+        console.log(err);
+        return;
+    }
+    if (this.tag != "all" && log.Name != this.tag) 
+      return
+    let index = this.state.data.length + 1;
+    if (10000 < index) {
+        log.Key = 1
+        this.setState({data: [log]})
+        return
+    }
+    log.Key = index
+    let newdata = this.state.data.concat(log);
+    this.setState({data: newdata});
+  },
   componentWillMount: function() {
       this.setState({data: []});
   },
   componentDidMount: function() {
-    SubscribeToLog((log, err) => {
-        if (err) {
-            console.log(err);
-            return;
-        }
-        let index = this.state.data.length + 1;
-        if (10000 < index) {
-            log.Key = 1
-            this.setState({data: [log]})
-            return
-        }
-        log.Key = index
-        let newdata = this.state.data.concat(log);
-        this.setState({data: newdata});
-    });
+    SubscribeToLog(this.tag, this.logHandler);
   },
   render: function() {
     return (
-      <div className="logbox">
-        <h1>Log Monitor</h1>
-        <LogList data={this.state.data} />
+      <div>
+        <div className="logbox">
+          <h1>Log Monitor</h1>
+        </div>
+        <div>
+          <Combobox
+            defaultValue = {'all'}
+            data={this.state.tags}
+            onChange={value => {
+              this.setState({data: []});
+              this.tag = value;
+              SubscribeToLog(this.tag, this.logHandler);
+            }}
+          />
+        </div>
+        <div>
+          <LogList data={this.state.data} />
+        </div>
       </div>
     );
   }
@@ -94,6 +113,6 @@ var LogList = React.createClass({
 });
 
 ReactDOM.render(
-  <LogBox pollInterval={2000} />,
+  <LogBox />,
   document.getElementById('content')
 );

@@ -6,35 +6,43 @@ import (
 
 type logcache struct {
 	mutex sync.Mutex
-	cache []logBody
+	cache map[string]([]logBody)
 	count int
 }
 
 func NewLogCache(n int) *logcache {
 	c := &logcache{
-		cache: []logBody{},
+		cache: make(map[string]([]logBody)),
 		count: n,
 	}
 	return c
 }
 
-func (lc *logcache) Append(log logBody) {
+func (lc *logcache) append(name string, log logBody) {
 	lc.mutex.Lock()
 	defer lc.mutex.Unlock()
-	tmp := append(lc.cache, log)
-	if len(tmp) <= lc.count {
-		lc.cache = tmp
+	logs, ok := lc.cache[name]
+	if !ok {
+		lc.cache[name] = []logBody{log}
+	}
+	logs = append(logs, log)
+	if len(logs) <= lc.count {
+		lc.cache[name] = logs
 	} else {
-		lc.cache = tmp[1:]
+		lc.cache[name] = logs[1:]
 	}
 }
+func (lc *logcache) Append(name string, log logBody) {
+	lc.append(name, log)
+	lc.append("all", log)
+}
 
-func (lc *logcache) GetCached() []logBody {
+func (lc *logcache) GetCached(name string) []logBody {
 	lc.mutex.Lock()
 	defer lc.mutex.Unlock()
-	result := []logBody{}
-	for _, v := range lc.cache {
-		result = append(result, v)
+	result, ok := lc.cache[name]
+	if !ok {
+		return []logBody{}
 	}
 	return result
 }
