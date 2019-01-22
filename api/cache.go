@@ -46,3 +46,11 @@ func (lc *logcache) GetCached(name string) []logBody {
 	}
 	return result
 }
+
+func (lc *logcache) GetNames() []string {
+	result := []string{}
+	for name := range lc.cache {
+		result = append(result, name)
+	}
+	return result
+}

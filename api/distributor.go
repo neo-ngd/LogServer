@@ -47,4 +47,10 @@ func Distribute(name string, log logBody) {
 			s.Emit("log:log", log)
 		}
 	}
+	ss, ok = distributor["all"]
+	if ok {
+		for _, s := range ss {
+			s.Emit("log:log", log)
+		}
+	}
 }

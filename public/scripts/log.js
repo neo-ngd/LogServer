@@ -34,22 +34,27 @@ var Log = React.createClass({
 
 var LogBox = React.createClass({
   getInitialState: function() {
-    return {data: []};
+    return {data: [], tag: "all", tags: ["all"]};
   },
-  logHandler: (log, err) => {
+  logHandler: function(log, err) {
     if (err) {
         console.log(err);
         return;
     }
-    if (this.tag != "all" && log.Name != this.tag) 
-      return
+    if (this.state.tag != "all" && log.Name != this.state.tag) 
+      return;
+    if (this.state.tags.every(ele => ele != log.Name)) {
+      let tags = this.state.tags;
+      tags.push(log.Name);
+      this.setState({tags: tags});
+    }
     let index = this.state.data.length + 1;
     if (10000 < index) {
-        log.Key = 1
-        this.setState({data: [log]})
-        return
+        log.Key = 1;
+        this.setState({data: [log]});
+        return;
     }
-    log.Key = index
+    log.Key = index;
     let newdata = this.state.data.concat(log);
     this.setState({data: newdata});
   },
@@ -57,28 +62,27 @@ var LogBox = React.createClass({
       this.setState({data: []});
   },
   componentDidMount: function() {
-    SubscribeToLog(this.tag, this.logHandler);
+    SubscribeToLog(this.state.tag, this.logHandler);
   },
   render: function() {
     return (
-      <div>
-        <div className="logbox">
-          <h1>Log Monitor</h1>
+      <div className="logbox">
+        <div className="header">
+          <div id="title">
+            <h1>Log Monitor</h1>
+          </div>
+          <div >
+            <Combobox
+              defaultValue = {"all"}
+              data={this.state.tags}
+              onChange={value => {
+                this.setState({data: [], tag: value});
+                SubscribeToLog(value, this.logHandler);
+              }}
+            />
+          </div>
         </div>
-        <div>
-          <Combobox
-            defaultValue = {'all'}
-            data={this.state.tags}
-            onChange={value => {
-              this.setState({data: []});
-              this.tag = value;
-              SubscribeToLog(this.tag, this.logHandler);
-            }}
-          />
-        </div>
-        <div>
           <LogList data={this.state.data} />
-        </div>
       </div>
     );
   }
