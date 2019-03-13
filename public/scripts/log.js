@@ -9,6 +9,7 @@
  * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+var Combobox = ReactWidgets.Combobox;
 function padding(num, length) {
   for(var len = (num + "").length; len < length; len = num.length) {
       num = "0" + num;            
@@ -33,33 +34,55 @@ var Log = React.createClass({
 
 var LogBox = React.createClass({
   getInitialState: function() {
-    return {data: []};
+    return {data: [], tag: "all", tags: ["all"]};
+  },
+  logHandler: function(log, err) {
+    if (err) {
+        console.log(err);
+        return;
+    }
+    if (this.state.tags.every(ele => ele != log.Name)) {
+      let tags = this.state.tags;
+      tags.push(log.Name);
+      this.setState({tags: tags});
+    }
+    if (this.state.tag != "all" && log.Name != this.state.tag) 
+      return;
+    let index = this.state.data.length + 1;
+    if (10000 < index) {
+        log.Key = 1;
+        this.setState({data: [log]});
+        return;
+    }
+    log.Key = index;
+    let newdata = this.state.data.concat(log);
+    this.setState({data: newdata});
   },
   componentWillMount: function() {
       this.setState({data: []});
   },
   componentDidMount: function() {
-    SubscribeToLog((log, err) => {
-        if (err) {
-            console.log(err);
-            return;
-        }
-        let index = this.state.data.length + 1;
-        if (10000 < index) {
-            log.Key = 1
-            this.setState({data: [log]})
-            return
-        }
-        log.Key = index
-        let newdata = this.state.data.concat(log);
-        this.setState({data: newdata});
-    });
+    SubscribeToLog(this.state.tag, this.logHandler);
   },
   render: function() {
     return (
       <div className="logbox">
-        <h1>Logs</h1>
-        <LogList data={this.state.data} />
+        <div className="header">
+          <div id="title">
+            <h1>Log Monitor</h1>
+          </div>
+          <div >
+            <Combobox
+              defaultValue = {"all"}
+              data={this.state.tags}
+              onChange={value => {
+                this.setState({data: [], tag: value});
+                SubscribeToLog(value, this.logHandler);
+              }}
+            />
+          </div>
+        </div>
+          <LogList data={this.state.data} />
       </div>
     );
   }
@@ -94,6 +117,6 @@ var LogList = React.createClass({
 });
 
 ReactDOM.render(
-  <LogBox pollInterval={2000} />,
+  <LogBox />,
   document.getElementById('content')
 );

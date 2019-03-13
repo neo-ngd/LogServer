@@ -28,16 +28,20 @@ func (s *SoServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *SoServer) handler(so socketio.Socket) {
-	golog.Info("on connection.")
 	so.Join("log")
-	so.On("log:subscribe", func(msg string) {
-		cache := s.cache.GetCached()
+	so.On("log:subscribe", func(name string) {
+		if _, ok := FindSocket(so); ok {
+			RemoveSubscriber(so)
+		}
+		AddSubscriber(name, so)
+		cache := s.cache.GetCached(name)
 		for _, v := range cache {
 			so.Emit("log:log", v)
 		}
-		golog.Info("on subscribe", msg)
+		golog.Info("on subscribe: ", name)
 	})
 	so.On("disconnection", func() {
+		RemoveSubscriber(so)
 		golog.Info("on disconnect")
 	})
 }
@@ -66,6 +70,6 @@ func (s *SoServer) SendLog(name, log string) {
 		Name: name,
 		Text: log,
 	}
-	s.cache.Append(l)
-	s.sosrv.BroadcastTo("log", "log:log", l)
+	s.cache.Append(name, l)
+	Distribute(name, l)
 }
