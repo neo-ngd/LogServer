@@ -41,13 +41,13 @@ var LogBox = React.createClass({
         console.log(err);
         return;
     }
-    if (this.state.tag != "all" && log.Name != this.state.tag) 
-      return;
     if (this.state.tags.every(ele => ele != log.Name)) {
       let tags = this.state.tags;
       tags.push(log.Name);
       this.setState({tags: tags});
     }
+    if (this.state.tag != "all" && log.Name != this.state.tag) 
+      return;
     let index = this.state.data.length + 1;
     if (10000 < index) {
         log.Key = 1;
