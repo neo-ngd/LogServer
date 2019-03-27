@@ -1,19 +1,31 @@
-var socketio = io(document.location.href + 'socket.io/')
+var socketio = null;
 var dispatch = {
     logger: null,
 }
-socketio.on('connect', function() {
-    socketio.on('log:log', log => {
-        if (dispatch.logger) {
-            dispatch.logger(log);
-        }
-    });
-});
-
-socketio.on('disconnect', function () {
-});
-
 var SubscribeToLog = function(tag, cb) {
-    socketio.emit('log:subscribe', tag);
-    dispatch.logger = cb;
+    if (socketio === null) {
+        socketio = io(document.location.href + 'socket.io/');
+        socketio.on('connect', function() {
+    
+        });
+        socketio.on('log:log', log => {
+            if (dispatch.logger) {
+                dispatch.logger(log);
+            }
+        });
+        socketio.on('disconnect', function () {
+            socketio.close();
+            socketio = null;
+        });
+        socketio.emit('log:subscribe', tag);
+        dispatch.logger = cb;
+    } else {
+        socketio.emit('log:subscribe', tag);
+        dispatch.logger = cb;
+    }
+    
+}
+var SocketClose = function() {
+    socketio.close();
+    socketio = null;
 }

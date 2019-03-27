@@ -64,6 +64,9 @@ var LogBox = React.createClass({
   componentDidMount: function() {
     SubscribeToLog(this.state.tag, this.logHandler);
   },
+  componentWillUnMount: function() {
+    SocketClose();
+  },
   render: function() {
     return (
       <div className="logbox">
