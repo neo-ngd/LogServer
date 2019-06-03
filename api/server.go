@@ -1,75 +1,50 @@
 package api
 
 import (
+	"fmt"
+	"io/ioutil"
+	"net"
 	"net/http"
 
 	"github.com/kataras/golog"
-
-	socketio "github.com/googollee/go-socket.io"
+	"github.com/neo-ngd/LogServer/api"
 )
 
-const cache_count = 50
-
-type logBody struct {
-	Text string
-	Name string
-	Key  int64
-}
-type SoServer struct {
-	sosrv *socketio.Server
-	cache *logcache
+type ApiServer struct {
+	host string
+	port int
+	tran *Transport
+	sto  *storage.Storage
+	so  *soserver
+	srv  *http.Server
 }
 
-func (s *SoServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
-	origin := r.Header.Get("Origin")
-	w.Header().Set("Access-Control-Allow-Origin", origin)
-	s.sosrv.ServeHTTP(w, r)
-}
-
-func (s *SoServer) handler(so socketio.Socket) {
-	so.Join("log")
-	so.On("log:subscribe", func(name string) {
-		if _, ok := FindSocket(so); ok {
-			RemoveSubscriber(so)
-		}
-		AddSubscriber(name, so)
-		cache := s.cache.GetCached(name)
-		for _, v := range cache {
-			so.Emit("log:log", v)
-		}
-		golog.Info("on subscribe: ", name)
-	})
-	so.On("disconnection", func() {
-		RemoveSubscriber(so)
-		golog.Info("on disconnect")
-	})
-}
-
-func (s *SoServer) errHandler(so socketio.Socket, err error) {
-	golog.Error(err)
-}
-
-func NewServer() (*SoServer, error) {
-	s, e := socketio.NewServer(nil)
-	if e != nil {
-		golog.Error(e)
-		return nil, nil
+func NewApiServer(host string, port int, p *storage.Storage) *ApiServer {
+	sosrv, err := newSoServer()
+	if err != nil {
+		golog.Fatal(err)
 	}
-	server := &SoServer{
-		sosrv: s,
-		cache: NewLogCache(cache_count),
+	s := Backend{
+		host: host,
+		port: port,
+		sto: 	p,
+		so:  sosrv
 	}
-	server.sosrv.On("connection", server.handler)
-	server.sosrv.On("error", server.errHandler)
-	return server, nil
+	mux := http.NewServeMux()
+	mux.Handle("/", http.FileServer(http.Dir("./public")))
+	mux.HandleFunc("/socket.io/", s.so.ServeHTTP)
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%d", port),
+		Handler: mux,
+	}
+	s.srv = srv
+	return &s
 }
 
-func (s *SoServer) SendLog(name, log string) {
-	l := logBody{
-		Name: name,
-		Text: log,
+func (s *ApiServer)Start() {
+	golog.Infof("start api srv listening: %d", s.port)
+
+	if err := s.srv.ListenAndServe(); err != nil {
+		golog.Fatal("ListenAndServe: ", err)
 	}
-	s.cache.Append(name, l)
-	Distribute(name, l)
 }

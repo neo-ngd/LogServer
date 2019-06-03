@@ -1,7 +1,8 @@
 {
     "name": "ngd",
-    "port": 8080,
-    "logpath": "./persist",
+    "rport": 8080,
+    "sport": 8081,
+    "logpath": "./logs",
     "logname": "concensus.log",
     "logfileexpire": 30,
     "logfilesplit": 1,

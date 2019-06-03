@@ -4,7 +4,7 @@ import socketio "github.com/googollee/go-socket.io"
 
 var distributor = make(map[string][]socketio.Socket)
 
-func AddSubscriber(name string, s socketio.Socket) {
+func addSubscriber(name string, s socketio.Socket) {
 	ss, ok := distributor[name]
 	if !ok {
 		distributor[name] = []socketio.Socket{s}
@@ -12,7 +12,7 @@ func AddSubscriber(name string, s socketio.Socket) {
 	distributor[name] = append(ss, s)
 }
 
-func FindSocket(so socketio.Socket) (string, bool) {
+func findSocket(so socketio.Socket) (string, bool) {
 	for name, ss := range distributor {
 		for _, s := range ss {
 			if s == so {
@@ -22,7 +22,7 @@ func FindSocket(so socketio.Socket) (string, bool) {
 	}
 	return "", false
 }
-func RemoveSubscriber(so socketio.Socket) {
+func removeSubscriber(so socketio.Socket) {
 	name, ok := FindSocket(so)
 	if !ok {
 		return
@@ -40,7 +40,7 @@ func RemoveSubscriber(so socketio.Socket) {
 	distributor[name] = ts
 }
 
-func Distribute(name string, log logBody) {
+func distribute(name string, log logBody) {
 	ss, ok := distributor[name]
 	if ok {
 		for _, s := range ss {
