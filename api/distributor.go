@@ -1,6 +1,9 @@
 package api
 
-import socketio "github.com/googollee/go-socket.io"
+import (
+	socketio "github.com/googollee/go-socket.io"
+	"github.com/neo-ngd/LogServer/storage"
+)
 
 var distributor = make(map[string][]socketio.Socket)
 
@@ -23,7 +26,7 @@ func findSocket(so socketio.Socket) (string, bool) {
 	return "", false
 }
 func removeSubscriber(so socketio.Socket) {
-	name, ok := FindSocket(so)
+	name, ok := findSocket(so)
 	if !ok {
 		return
 	}
@@ -40,7 +43,7 @@ func removeSubscriber(so socketio.Socket) {
 	distributor[name] = ts
 }
 
-func distribute(name string, log logBody) {
+func distribute(name string, log storage.LogBody) {
 	ss, ok := distributor[name]
 	if ok {
 		for _, s := range ss {

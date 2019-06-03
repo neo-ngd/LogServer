@@ -2,33 +2,33 @@ package api
 
 import (
 	"fmt"
-	"io/ioutil"
-	"net"
 	"net/http"
 
+	"github.com/neo-ngd/LogServer/storage"
+
 	"github.com/kataras/golog"
-	"github.com/neo-ngd/LogServer/api"
 )
 
 type ApiServer struct {
 	host string
 	port int
-	tran *Transport
 	sto  *storage.Storage
-	so  *soserver
+	so   *soServer
 	srv  *http.Server
+	c    chan storage.LogBody
 }
 
 func NewApiServer(host string, port int, p *storage.Storage) *ApiServer {
-	sosrv, err := newSoServer()
+	sosrv, err := newSoServer(p)
 	if err != nil {
 		golog.Fatal(err)
 	}
-	s := Backend{
+	s := ApiServer{
 		host: host,
 		port: port,
-		sto: 	p,
-		so:  sosrv
+		sto:  p,
+		so:   sosrv,
+		c:    make(chan storage.LogBody, 10),
 	}
 	mux := http.NewServeMux()
 	mux.Handle("/", http.FileServer(http.Dir("./public")))
@@ -41,10 +41,22 @@ func NewApiServer(host string, port int, p *storage.Storage) *ApiServer {
 	return &s
 }
 
-func (s *ApiServer)Start() {
+func (s *ApiServer) Start() {
+	s.sto.Regist(s.c)
 	golog.Infof("start api srv listening: %d", s.port)
-
-	if err := s.srv.ListenAndServe(); err != nil {
-		golog.Fatal("ListenAndServe: ", err)
-	}
+	go func() {
+		if err := s.srv.ListenAndServe(); err != nil {
+			golog.Fatal("ListenAndServe: ", err)
+		}
+	}()
+	go func() {
+		for {
+			l, ok := <-s.c
+			if !ok {
+				golog.Infof("channel closed.")
+				return
+			}
+			s.so.sendLog(l.Name, l.Text)
+		}
+	}()
 }

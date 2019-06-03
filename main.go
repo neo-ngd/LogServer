@@ -19,6 +19,7 @@ func main() {
 		config.LogFileSplit,
 	)
 	s := api.NewApiServer(localhost, config.SPort, storage)
+	s.Start()
 	b := backend.NewBackend(config.Name, localhost, config.RPort, config.Friends, storage)
 	b.Start()
 }

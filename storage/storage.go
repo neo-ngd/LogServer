@@ -11,8 +11,9 @@ type LogBody struct {
 }
 
 type Storage struct {
-	p *persist
-	c *logcache
+	p        *persist
+	c        *logcache
+	registee []chan<- LogBody
 }
 
 func NewStorage(path, name string, age, split time.Duration) *Storage {
@@ -28,6 +29,9 @@ func (s *Storage) Append(name, log string) {
 	}
 	s.p.append(name, log)
 	s.c.append(name, l)
+	for _, c := range s.registee {
+		c <- l
+	}
 }
 
 func (s *Storage) GetCached(name string) []LogBody {
@@ -36,4 +40,8 @@ func (s *Storage) GetCached(name string) []LogBody {
 
 func (s *Storage) GetNames() []string {
 	return s.c.getNames()
+}
+
+func (s *Storage) Regist(r chan<- LogBody) {
+	s.registee = append(s.registee, r)
 }
