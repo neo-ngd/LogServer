@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -16,10 +17,12 @@ type Storage struct {
 	registee []chan<- LogBody
 }
 
+const cache_count = 50
+
 func NewStorage(path, name string, age, split time.Duration) *Storage {
 	return &Storage{
 		p: newPersist(path, name, age, split),
-		c: newLogCache(50),
+		c: newLogCache(cache_count),
 	}
 }
 func (s *Storage) Append(name, log string) {
@@ -27,7 +30,7 @@ func (s *Storage) Append(name, log string) {
 		Text: log,
 		Name: name,
 	}
-	s.p.append(name, log)
+	s.p.append(fmt.Sprintf("[%s]", name), log)
 	s.c.append(name, l)
 	for _, c := range s.registee {
 		c <- l

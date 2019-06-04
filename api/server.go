@@ -13,26 +13,23 @@ type ApiServer struct {
 	host string
 	port int
 	sto  *storage.Storage
-	so   *soServer
+	so   *wsServer
 	srv  *http.Server
 	c    chan storage.LogBody
 }
 
 func NewApiServer(host string, port int, p *storage.Storage) *ApiServer {
-	sosrv, err := newSoServer(p)
-	if err != nil {
-		golog.Fatal(err)
-	}
+	wssrv := newWsServer(p)
 	s := ApiServer{
 		host: host,
 		port: port,
 		sto:  p,
-		so:   sosrv,
+		so:   wssrv,
 		c:    make(chan storage.LogBody, 10),
 	}
 	mux := http.NewServeMux()
 	mux.Handle("/", http.FileServer(http.Dir("./public")))
-	mux.HandleFunc("/socket.io/", s.so.ServeHTTP)
+	mux.HandleFunc("/ws/", s.so.handler)
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", port),
 		Handler: mux,

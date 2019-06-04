@@ -4,7 +4,7 @@ require (
 	github.com/fastly/go-utils v0.0.0-20180712184237-d95a45783239 // indirect
 	github.com/googollee/go-engine.io v0.0.0-20180829091931-e2f255711dcb // indirect
 	github.com/googollee/go-socket.io v0.0.0-20181101151912-c8aeb1ed9b49
-	github.com/gorilla/websocket v1.4.0 // indirect
+	github.com/gorilla/websocket v1.4.0
 	github.com/jehiah/go-strftime v0.0.0-20171201141054-1d33003b3869 // indirect
 	github.com/jonboulle/clockwork v0.1.0 // indirect
 	github.com/kataras/golog v0.0.0-20180321173939-03be10146386

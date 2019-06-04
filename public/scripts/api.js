@@ -1,31 +1,43 @@
-var socketio = null;
-var dispatch = {
-    logger: null,
-}
-var SubscribeToLog = function(tag, cb) {
-    if (socketio === null) {
-        socketio = io(document.location.href + 'socket.io/');
-        socketio.on('connect', function() {
-    
-        });
-        socketio.on('log:log', log => {
-            if (dispatch.logger) {
-                dispatch.logger(log);
-            }
-        });
-        socketio.on('disconnect', function () {
-            socketio.close();
-            socketio = null;
-        });
-        socketio.emit('log:subscribe', tag);
-        dispatch.logger = cb;
-    } else {
-        socketio.emit('log:subscribe', tag);
-        dispatch.logger = cb;
+var wsServer = document.location.href.replace("http", "ws") + "ws/";
+var ws = new WebSocket(wsServer);
+var logger = null
+var message = ""
+ws.onopen = function (e) {
+    console.log("Connected to WebSocket server.",e);
+    if (logger) {
+        ws.send(message)
     }
-    
+} ;
+
+ws.onclose = function (e) {
+    console.log("Disconnected",e);
+} ;
+
+ws.onmessage = function(e) {
+    let logbody = JSON.parse(e.data)
+    if (logger) {
+        logger(logbody);
+    }
 }
-var SocketClose = function() {
-    socketio.close();
-    socketio = null;
+
+ws.onerror = function (e) {
+    console.log('Error occured: ' + e.data,e);
+} ;
+
+function Regist(name, cb) {
+    console.log("regist")
+    logger = cb;
+    console.log(ws.OPEN, ws.CONNECTING, ws.CLOSED, ws.CLOSING)
+    console.log(ws.readyState)
+    if (ws.readyState === ws.OPEN) {
+        console.log("send")
+        ws.send(name);
+        return;
+    }
+    console.log("store")
+    message = name;
+}
+
+function Close() {
+    ws.close()
 }

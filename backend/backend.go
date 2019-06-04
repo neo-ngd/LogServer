@@ -61,7 +61,7 @@ func (s *Backend) handler(w http.ResponseWriter, r *http.Request) {
 		s.tran.Transfer(log)
 	}
 	//persist
-	go s.sto.Append(fmt.Sprintf("[%s]", name), log+"\n")
+	go s.sto.Append(fmt.Sprintf("%s", name), log+"\n")
 }
 
 func (s *Backend) GetRemoteIp(r *http.Request) string {

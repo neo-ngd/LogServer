@@ -62,7 +62,7 @@ var LogBox = React.createClass({
       this.setState({data: []});
   },
   componentDidMount: function() {
-    SubscribeToLog(this.state.tag, this.logHandler);
+    Regist(this.state.tag, this.logHandler);
   },
   componentWillUnMount: function() {
     SocketClose();
@@ -80,7 +80,7 @@ var LogBox = React.createClass({
               data={this.state.tags}
               onChange={value => {
                 this.setState({data: [], tag: value});
-                SubscribeToLog(value, this.logHandler);
+                Regist(value, this.logHandler);
               }}
             />
           </div>

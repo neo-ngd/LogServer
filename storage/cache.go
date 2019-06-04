@@ -18,7 +18,7 @@ func newLogCache(n int) *logcache {
 	return c
 }
 
-func (lc *logcache) append(name string, log LogBody) {
+func (lc *logcache) lappend(name string, log LogBody) {
 	lc.mutex.Lock()
 	defer lc.mutex.Unlock()
 	logs, ok := lc.cache[name]
@@ -31,6 +31,11 @@ func (lc *logcache) append(name string, log LogBody) {
 	} else {
 		lc.cache[name] = logs[1:]
 	}
+}
+
+func (lc *logcache) append(name string, log LogBody) {
+	lc.lappend(name, log)
+	lc.lappend("all", log)
 }
 
 func (lc *logcache) getCached(name string) []LogBody {
