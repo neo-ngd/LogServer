@@ -36,6 +36,7 @@ func (ws *wsServer) handler(w http.ResponseWriter, r *http.Request) {
 			mtype, data, err := conn.ReadMessage()
 			if err != nil {
 				golog.Error(err)
+				removeSubscriber(conn)
 				conn.Close()
 				return
 			}
