@@ -11,7 +11,8 @@ import (
 
 var (
 	Friends       []string
-	Port          int
+	SPort         int
+	RPort         int
 	LogPath       string
 	LogName       string
 	LogFileExpire time.Duration
@@ -26,7 +27,8 @@ func init() {
 	}
 	var config struct {
 		Name          string   `json:"name"`
-		Port          int      `json:"port"`
+		SPort         int      `json:"sport"`
+		RPort         int      `json:"rport"`
 		Friends       []string `json:"sendto"`
 		LogPath       string   `json:"logpath"`
 		LogName       string   `json:"logname"`
@@ -37,7 +39,8 @@ func init() {
 	if err != nil {
 		golog.Error(err)
 	}
-	Port = config.Port
+	SPort = config.SPort
+	RPort = config.RPort
 	Friends = config.Friends
 	LogPath = config.LogPath
 	LogName = config.LogName
@@ -54,7 +57,7 @@ func init() {
 		arr := strings.Split(v, ":")
 		if (arr[0] == "127.0.0.1" || arr[0] == "" ||
 			arr[0] == "localhost" || arr[0] == "0.0.0.0") &&
-			arr[1] == string(Port) {
+			arr[1] == string(RPort) {
 			golog.Fatal("you cannt send log to yourself.")
 		}
 	}

@@ -6,9 +6,8 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/neo-ngd/LogServer/api"
-
 	"github.com/kataras/golog"
+	"github.com/neo-ngd/LogServer/storage"
 )
 
 type Backend struct {
@@ -16,43 +15,34 @@ type Backend struct {
 	host string
 	port int
 	tran *Transport
-	pers *Persist
-	api  *api.SoServer
+	sto  *storage.Storage
 	srv  *http.Server
 }
 
-func NewBackend(name, host string, port int, friends []string, p *Persist) *Backend {
-	apisrv, err := api.NewServer()
-	if err != nil {
-		golog.Fatal(err)
-	}
-	s := Backend{
+func NewBackend(name, host string, port int, friends []string, p *storage.Storage) *Backend {
+
+	b := Backend{
 		name: name,
 		host: host,
 		port: port,
 		tran: NewTransport(name, friends),
-		pers: p,
-		api:  apisrv,
+		sto:  p,
 	}
 	mux := http.NewServeMux()
-	mux.Handle("/", http.FileServer(http.Dir("./public")))
-	mux.HandleFunc("/log", s.handler)
-	mux.HandleFunc("/socket.io/", apisrv.ServeHTTP)
+	mux.HandleFunc("/log", b.handler)
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", port),
 		Handler: mux,
 	}
-	s.srv = srv
-	return &s
+	b.srv = srv
+	return &b
 }
 
 func (s *Backend) Start() {
-	golog.Infof("start listening: %d", s.port)
-
+	golog.Infof("start receive srv listening: %d", s.port)
 	if err := s.srv.ListenAndServe(); err != nil {
 		golog.Fatal("ListenAndServe: ", err)
 	}
-
 }
 
 func (s *Backend) handler(w http.ResponseWriter, r *http.Request) {
@@ -71,10 +61,7 @@ func (s *Backend) handler(w http.ResponseWriter, r *http.Request) {
 		s.tran.Transfer(log)
 	}
 	//persist
-	s.pers.Add(fmt.Sprintf("[%s]", name), log+"\n")
-
-	//send to web
-	go s.api.SendLog(name, log)
+	go s.sto.Append(fmt.Sprintf("%s", name), log+"\n")
 }
 
 func (s *Backend) GetRemoteIp(r *http.Request) string {

@@ -1,18 +1,21 @@
 package api
 
-import socketio "github.com/googollee/go-socket.io"
+import (
+	"github.com/gorilla/websocket"
+	"github.com/neo-ngd/LogServer/storage"
+)
 
-var distributor = make(map[string][]socketio.Socket)
+var distributor = make(map[string][]*websocket.Conn)
 
-func AddSubscriber(name string, s socketio.Socket) {
+func addSubscriber(name string, s *websocket.Conn) {
 	ss, ok := distributor[name]
 	if !ok {
-		distributor[name] = []socketio.Socket{s}
+		distributor[name] = []*websocket.Conn{s}
 	}
 	distributor[name] = append(ss, s)
 }
 
-func FindSocket(so socketio.Socket) (string, bool) {
+func findSocket(so *websocket.Conn) (string, bool) {
 	for name, ss := range distributor {
 		for _, s := range ss {
 			if s == so {
@@ -22,13 +25,13 @@ func FindSocket(so socketio.Socket) (string, bool) {
 	}
 	return "", false
 }
-func RemoveSubscriber(so socketio.Socket) {
-	name, ok := FindSocket(so)
+func removeSubscriber(so *websocket.Conn) {
+	name, ok := findSocket(so)
 	if !ok {
 		return
 	}
 	ss := distributor[name]
-	ts := make([]socketio.Socket, len(ss)-1)
+	ts := make([]*websocket.Conn, len(ss)-1)
 	j := 0
 	for _, v := range ss {
 		if v == so {
@@ -40,17 +43,17 @@ func RemoveSubscriber(so socketio.Socket) {
 	distributor[name] = ts
 }
 
-func Distribute(name string, log logBody) {
+func distribute(name string, log storage.LogBody) {
 	ss, ok := distributor[name]
 	if ok {
 		for _, s := range ss {
-			s.Emit("log:log", log)
+			s.WriteJSON(log)
 		}
 	}
 	ss, ok = distributor["all"]
 	if ok {
 		for _, s := range ss {
-			s.Emit("log:log", log)
+			s.WriteJSON(log)
 		}
 	}
 }

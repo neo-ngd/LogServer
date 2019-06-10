@@ -1,75 +1,59 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 
-	"github.com/kataras/golog"
+	"github.com/neo-ngd/LogServer/storage"
 
-	socketio "github.com/googollee/go-socket.io"
+	"github.com/kataras/golog"
 )
 
-const cache_count = 50
-
-type logBody struct {
-	Text string
-	Name string
-	Key  int64
-}
-type SoServer struct {
-	sosrv *socketio.Server
-	cache *logcache
+type ApiServer struct {
+	host string
+	port int
+	sto  *storage.Storage
+	so   *wsServer
+	srv  *http.Server
+	c    chan storage.LogBody
 }
 
-func (s *SoServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
-	origin := r.Header.Get("Origin")
-	w.Header().Set("Access-Control-Allow-Origin", origin)
-	s.sosrv.ServeHTTP(w, r)
+func NewApiServer(host string, port int, p *storage.Storage) *ApiServer {
+	wssrv := newWsServer(p)
+	s := ApiServer{
+		host: host,
+		port: port,
+		sto:  p,
+		so:   wssrv,
+		c:    make(chan storage.LogBody, 10),
+	}
+	mux := http.NewServeMux()
+	mux.Handle("/", http.FileServer(http.Dir("./public")))
+	mux.HandleFunc("/ws/", s.so.handler)
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%d", port),
+		Handler: mux,
+	}
+	s.srv = srv
+	return &s
 }
 
-func (s *SoServer) handler(so socketio.Socket) {
-	so.Join("log")
-	so.On("log:subscribe", func(name string) {
-		if _, ok := FindSocket(so); ok {
-			RemoveSubscriber(so)
+func (s *ApiServer) Start() {
+	s.sto.Regist(s.c)
+	golog.Infof("start api srv listening: %d", s.port)
+	go func() {
+		if err := s.srv.ListenAndServe(); err != nil {
+			golog.Fatal("ListenAndServe: ", err)
 		}
-		AddSubscriber(name, so)
-		cache := s.cache.GetCached(name)
-		for _, v := range cache {
-			so.Emit("log:log", v)
+	}()
+	go func() {
+		for {
+			l, ok := <-s.c
+			if !ok {
+				golog.Infof("channel closed.")
+				return
+			}
+			s.so.sendLog(l.Name, l.Text)
 		}
-		golog.Info("on subscribe: ", name)
-	})
-	so.On("disconnection", func() {
-		RemoveSubscriber(so)
-		golog.Info("on disconnect")
-	})
-}
-
-func (s *SoServer) errHandler(so socketio.Socket, err error) {
-	golog.Error(err)
-}
-
-func NewServer() (*SoServer, error) {
-	s, e := socketio.NewServer(nil)
-	if e != nil {
-		golog.Error(e)
-		return nil, nil
-	}
-	server := &SoServer{
-		sosrv: s,
-		cache: NewLogCache(cache_count),
-	}
-	server.sosrv.On("connection", server.handler)
-	server.sosrv.On("error", server.errHandler)
-	return server, nil
-}
-
-func (s *SoServer) SendLog(name, log string) {
-	l := logBody{
-		Name: name,
-		Text: log,
-	}
-	s.cache.Append(name, l)
-	Distribute(name, l)
+	}()
 }

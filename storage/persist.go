@@ -1,4 +1,4 @@
-package backend
+package storage
 
 import (
 	"os"
@@ -6,30 +6,30 @@ import (
 	"time"
 
 	"github.com/kataras/golog"
-	"github.com/lestrrat/go-file-rotatelogs"
+	rotatelogs "github.com/lestrrat/go-file-rotatelogs"
 	"github.com/pkg/errors"
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
 )
 
-type Persist struct {
+type persist struct {
 	log *logrus.Logger
 }
-type PlainFormatter struct {
+type plainFormatter struct {
 }
 
-func (p *PlainFormatter) Format(entry *logrus.Entry) ([]byte, error) {
+func (p *plainFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	return []byte(entry.Message), nil
 }
-func NewPersist(logPath, logname string, maxAge, rotationTime time.Duration) *Persist {
-	p := Persist{
+func newPersist(logPath, logname string, maxAge, rotationTime time.Duration) *persist {
+	p := persist{
 		log: logrus.New(),
 	}
 	p.log.SetLevel(logrus.InfoLevel)
 	p.configLocalFilesystemLogger(logPath, logname, maxAge, rotationTime)
 	return &p
 }
-func (p *Persist) configLocalFilesystemLogger(logPath string, logFileName string, maxAge time.Duration, rotationTime time.Duration) {
+func (p *persist) configLocalFilesystemLogger(logPath string, logFileName string, maxAge time.Duration, rotationTime time.Duration) {
 	_, err := os.Stat(logPath)
 	if err != nil {
 		err = os.Mkdir(logPath, os.ModePerm)
@@ -54,10 +54,10 @@ func (p *Persist) configLocalFilesystemLogger(logPath string, logFileName string
 		logrus.ErrorLevel: writer,
 		logrus.FatalLevel: writer,
 		logrus.PanicLevel: writer,
-	}, &PlainFormatter{})
+	}, &plainFormatter{})
 	p.log.AddHook(lfHook)
 }
 
-func (p *Persist) Add(arg ...interface{}) {
+func (p *persist) append(arg ...interface{}) {
 	p.log.Println(arg...)
 }

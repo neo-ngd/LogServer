@@ -1,8 +1,10 @@
 package main
 
 import (
+	"github.com/neo-ngd/LogServer/api"
 	"github.com/neo-ngd/LogServer/backend"
 	"github.com/neo-ngd/LogServer/config"
+	"github.com/neo-ngd/LogServer/storage"
 )
 
 const (
@@ -10,12 +12,14 @@ const (
 )
 
 func main() {
-	p := backend.NewPersist(
+	storage := storage.NewStorage(
 		config.LogPath,
 		config.LogName,
 		config.LogFileExpire,
 		config.LogFileSplit,
 	)
-	s := backend.NewBackend(config.Name, localhost, config.Port, config.Friends, p)
+	s := api.NewApiServer(localhost, config.SPort, storage)
 	s.Start()
+	b := backend.NewBackend(config.Name, localhost, config.RPort, config.Friends, storage)
+	b.Start()
 }
