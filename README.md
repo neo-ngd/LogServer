@@ -27,7 +27,8 @@ after installation, configure your this application in **config.json**
 ```
 {
     "name": "ngd",//the name of your node, let partners to recognize you
-    "port": 8080, //server port
+    "rport": 8080, //the port receive log
+    "sport": 8080, //the port serve web api
     "logpath": "./persist",//directory to store the log
     "logname": "concensus.log",//log file name
     "logfileexpire": 30,//day, how many days you want to store the log 
@@ -42,7 +43,7 @@ after installation, configure your this application in **config.json**
 
 > set your node name to let partners recognize you, LogServer use name to set in Http Header "From" when sending to partner.
 
-> "__port__ " is for serving cn-node LogPlugin using "__http://logserverip:port/log__" and LogMonitor using "__http://logserverip:port__".
+> "__rport__ " is for serving cn-node LogPlugin using "__http://logserverip:rport/log__" and LogMonitor using "__http://logserverip:sport__".
 
 ## 5. usage
 LogServer can both receive logs from cn and provide LogMonitor 
