@@ -28,7 +28,7 @@ after installation, configure your this application in **config.json**
 {
     "name": "ngd",//the name of your node, let partners to recognize you
     "rport": 8080, //the port receive log
-    "sport": 8080, //the port serve web api
+    "sport": 8081, //the port serve web api
     "logpath": "./persist",//directory to store the log
     "logname": "concensus.log",//log file name
     "logfileexpire": 30,//day, how many days you want to store the log 
