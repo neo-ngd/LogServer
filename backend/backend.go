@@ -3,6 +3,7 @@ package backend
 import (
 	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"net"
 	"net/http"
 
@@ -11,22 +12,20 @@ import (
 )
 
 type Backend struct {
-	name string
-	host string
-	port int
-	tran *Transport
-	sto  *storage.Storage
-	srv  *http.Server
+	host    string
+	port    int
+	sto     *storage.Storage
+	srv     *http.Server
+	unkowns map[string]string
 }
 
-func NewBackend(name, host string, port int, friends []string, p *storage.Storage) *Backend {
+func NewBackend(host string, port int, p *storage.Storage) *Backend {
 
 	b := Backend{
-		name: name,
-		host: host,
-		port: port,
-		tran: NewTransport(name, friends),
-		sto:  p,
+		host:    host,
+		port:    port,
+		sto:     p,
+		unkowns: make(map[string]string, 7),
 	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("/log", b.handler)
@@ -57,8 +56,13 @@ func (s *Backend) handler(w http.ResponseWriter, r *http.Request) {
 	log := string(bytes)
 	name := r.Header.Get("From")
 	if name == "" {
-		name = s.name
-		s.tran.Transfer(log)
+		ip := s.GetRemoteIp(r)
+		if n, ok := s.unkowns[ip]; ok {
+			name = n
+		} else {
+			name = fmt.Sprintf("unkown_%d", rand.Int31())
+			s.unkowns[ip] = name
+		}
 	}
 	//persist
 	go s.sto.Append(fmt.Sprintf("%s", name), log+"\n")

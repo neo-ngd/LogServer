@@ -1,11 +1,8 @@
 {
-    "name": "ngd",
     "rport": 8080,
     "sport": 8081,
     "logpath": "./logs",
     "logname": "concensus.log",
     "logfileexpire": 30,
-    "logfilesplit": 1,
-    "sendto":[
-    ]
+    "logfilesplit": 1
 }
